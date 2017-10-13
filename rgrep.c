@@ -1,5 +1,6 @@
 #include <stdio.h>
 #define MAXSIZE 4096
+int strlen(char * string);
 
 /**
  * You can use this recommended helper function 
@@ -19,11 +20,9 @@ int matches_leading(char *partial_line, char *pattern) {
  * Implementation of the rgrep matcher function
  */
 int rgrep_matches(char *line, char *pattern) {
-
-    //
-    // Implement me 
-    //
-
+	
+	
+   
     return 0;
 }
 
@@ -52,4 +51,13 @@ int main(int argc, char **argv) {
     }
 
     return 0;
+}
+
+/*Strlen function built for rgrep*/
+int strlen(char * string){
+	int i = 0;
+	while(string[i] != '\0'){
+		i++;
+	}
+	return i;
 }
