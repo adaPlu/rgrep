@@ -1,5 +1,5 @@
 /*
-Test file to test strlen and other functions built for rgrep.
+Test file to test individual functions built for rgrep.
 */
 
 #include<stdio.h>
@@ -11,9 +11,18 @@ int strleng(char * string){
 	}
 	return i;
 }
+int firstOccur(char * line, char  c){
+	int n  = strleng(line);
+	for(int i = 0; i < n; i++){
+			if(line[i] == c)
+				return i;
+		
+	}
+	return 0;
+}
 
 int main(void){
-char* string = "123456789";
-printf("%d", strleng(string));
+char* string = "aaaaas";
+printf("%d", firstOccur(string, 's'));
 
 }
