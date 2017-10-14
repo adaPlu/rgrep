@@ -40,6 +40,11 @@ int matches_leading(char *partial_line, char *pattern) {
 	*/
 	
 int rgrep_matches(char *line, char *pattern){
+	//ifspecial chars in line
+	
+	
+	
+	//else do all below
 	int n = strleng(pattern);
 	int matches = 0;
 	int index = firstOccur(line, pattern[0]);
@@ -147,3 +152,27 @@ int firstOccur(char * line, char  c){
 	}
 	return 5000;
 }
+
+
+/*
+Single letter pattern
+returns 1 if first char of pattern is in the letter
+int patternlen1(char *line, char *pattern){
+//Prints all strings containing single character.
+	int matches = 0;
+	for(int i = 0; i < 1; i++){
+		for(int j = 0, l = strleng(line); j < l; j++){
+				if(line[j] == pattern[i])
+					matches++;					
+		}
+	}
+	if(matches > 0){
+		//printf("%s", line);
+		return 1;
+	}
+	return 0;
+}
+
+
+
+*/
