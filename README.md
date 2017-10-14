@@ -4,4 +4,4 @@ Background grep is a UNIX utility that is used to parse or search through string
 
 Usage ./rgrep 'pattern'
 
-Usage with .txt file: ./rgrep 'pattern' filename.txt
+Usage with .txt file: ./rgrep 'pattern' < filename.txt
