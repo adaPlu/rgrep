@@ -1,3 +1,14 @@
+Build test cases for all these in test.txt
+Usage:
+	a+ Matches a, aa, aaaaa or really any number of a’s more than one 
+	.+ Matches any non-empty String 
+	\\+ Matches a string of \’s
+	a?b+ Matches ab, b, abbb or any amount of b following op:onal a. 
+	\? A question mark must appear in the line 
+	they?re Matches a line that contains either the string "theyre" or the string "there" 
+	h.d..?n Matches lines that contain substrings like "hidden", "hidin", "hbdwen", "hadbn", etc.
+	cu\.?t Matches lines that either contain the substring "cut" or "cu.t" 
+	
 aa
 aah
 aahed
