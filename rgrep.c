@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-/*Strlen function built for rgrep*/
+/*Strlen function*/
 int strleng(char * string){
 	int i = 0;
 	while(string[i] != '\0'){
@@ -119,8 +119,19 @@ int strleng(char * string){
 	return i;
 }
 
+/*Returns index of first char in string that matches first char in pattern, returns 5000 if no matches*/
+int firstOccur(char * line, char  c){
+	int n  = strleng(line);
+	for(int i = 0; i < n; i++){
+			if(line[i] == c)
+				return i;
+		
+	}
+	return 5000;
+}
+
 /*Single letter pattern
-returns 1 if first char of pattern is in the letter*/
+returns 1 if first char of pattern is in the letter
 int patternlen1(char *line, char *pattern){
 //Prints all strings containing single character.
 	int matches = 0;
@@ -136,14 +147,4 @@ int patternlen1(char *line, char *pattern){
 	}
 	return 0;
 }
-
-/*Returns index of first char in string that matches first char in pattern, returns 5000 if no matches*/
-int firstOccur(char * line, char  c){
-	int n  = strleng(line);
-	for(int i = 0; i < n; i++){
-			if(line[i] == c)
-				return i;
-		
-	}
-	return 5000;
-}
+*/
