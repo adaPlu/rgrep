@@ -3,9 +3,9 @@
 
 //Funtions
 int strleng(char * string);
-int patternlen1(char *line, char *pattern);
-int firstOccur(char * line, char c);
-
+//int patternlen1(char *line, char *pattern);
+int firstOccur(char* line, char c);
+int checkSpecial(char* pattern);
 /**
  * You can use this recommended helper function 
  * Returns true if partial_line matches pattern, starting from
@@ -29,7 +29,7 @@ int matches_leading(char *partial_line, char *pattern) {
 	? = preceeding char may or may not appear
 	\ = nullifys any special meaning of the previous character
 	Usage:
-	a+ Matches a, aa, aaaaa or really any number of a’s more than one 
+	a+ Matches a, aa, aaaaa or sreally any number of a’s more than one 
 	.+ Matches any non-empty String 
 	\\+ Matches a string of \’s
 	a?b+ Matches ab, b, abbb or any amount of b following op:onal a. 
@@ -40,47 +40,69 @@ int matches_leading(char *partial_line, char *pattern) {
 	*/
 	
 int rgrep_matches(char *line, char *pattern){
+	//printf("%d\n", checkSpecial(pattern));
+	printf("%d\n", n);
 	int n = strleng(pattern);
-	int matches = 0;
-	int index = firstOccur(line, pattern[0]);
-	//If pattern is empty string, prints all lines
-	if(n == 0)
-		printf("%s", line);
-	//If pattern is length one char and no special chars.
-	else if(n==1){
-		if(index != 5000){
-			/*check for next letter in pattern in line*/
+	if(checkSpecial(pattern) != 5000){
+		switch(pattern[checkSpecial(pattern)]) {
+		case '.' :
+			if(strleng(line) == n){
+				printf("%s", line);
+			}
+			else
+				return 1;
+		case '\\' :
+			return 2;
+		case '+' :
+			return 3;
+		case '\?' :
+			return 4;
+		default :
+			return 0;
+		}
+	}
+	else{
+		int matches = 0;
+		int index = firstOccur(line, pattern[0]);
+		//If pattern is empty string, prints all lines
+		if(n == 0)
 			printf("%s", line);
-			return 0;
+		//If pattern is length one char and no special chars.
+		else if(n==1){
+			if(index != 5000){
+				/*check for next letter in pattern in line*/
+				printf("%s", line);
+				return 0;
+			}
+			//if(patternlen1(line, pattern))
+				//printf("%s", line);
 		}
-		//if(patternlen1(line, pattern))
-			//printf("%s", line);
-	}
-	//If pattern length > 1 and no special chars.
-	else if (n > 1){
-		if(index != 5000){
-			matches++;
-			/*check for next letter in pattern in line*/
-			//printf("index:%d, n:%d ", index, n);
-				for(int i = 1, l = strleng(line); i < l; i++){
-					if(pattern[i] == line[index + i]){
-						matches++;
-						//printf("matches:%d ", matches);
-						if(matches == n){
-							printf("%s", line);
+		//If pattern length > 1 and no special chars.
+		else if (n > 1){
+			if(index != 5000){
+				matches++;
+				/*check for next letter in pattern in line*/
+				//printf("index:%d, n:%d ", index, n);
+					for(int i = 1, l = strleng(line); i < l; i++){
+						if(pattern[i] == line[index + i]){
+							matches++;
+							//printf("matches:%d ", matches);
+							if(matches == n){
+								printf("%s", line);
+							}
 						}
+						else
+							return 0;
 					}
-					else
-						return 0;
-				}
+			}
+			else
+				return 0;
+		
+		
 		}
-		else
-			return 0;
-		
-		
-	}
 	
-    return 0;
+		return 0;
+	}
 }
 
 int main(int argc, char **argv) {
@@ -129,6 +151,50 @@ int firstOccur(char * line, char  c){
 	}
 	return 5000;
 }
+/*Checks for any special characters not proceeded by a \(escape char)
+returns index of special char or returns 5000
+	. = any char
+	+ = preceeding will appear any # of times
+	? = preceeding char may or may not appear
+	\ = nullifys any special meaning of the previous character*/
+int checkSpecial(char* pattern){
+	int n = strleng(pattern);
+	//checks for .
+	for(int i = 0; i < n; i++){
+		if(pattern[i] == '.'){
+			if(i != 0 && pattern[i-1] != 92){
+				return i;
+				
+			}
+			else
+				return i;
+		}
+	}
+	//checks for +
+	for(int i = 0; i < n; i++){
+		if(pattern[i] == '+'){
+			if(i != 0 && pattern[i-1] != 92){
+				return i;
+				
+			}
+			else
+				return i;
+		}
+	}	
+	//checks for ?
+	for(int i = 0; i < n; i++){
+		if(pattern[i] == '?'){
+			if(i != 0 && pattern[i-1] != 92){
+				return i;
+				
+			}
+			else
+				return i;
+		}
+	}	
+			
+	return 5000;
+}
 
 /*Single letter pattern
 returns 1 if first char of pattern is in the letter
@@ -136,6 +202,7 @@ int patternlen1(char *line, char *pattern){
 //Prints all strings containing single character.
 	int matches = 0;
 	for(int i = 0; i < 1; i++){
+		
 		for(int j = 0, l = strleng(line); j < l; j++){
 				if(line[j] == pattern[i])
 					matches++;					

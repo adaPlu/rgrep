@@ -1,0 +1,6 @@
+gcc -g -c <file.c>
+this makes a file.o file.
+gcc -o <desiredFileName> <file.o>
+This make the actual executable.
+ all at once?
+gcc -std=c99 -O0 -Wall -Werror -g -pedantic  rgrep.c -o rgrep
