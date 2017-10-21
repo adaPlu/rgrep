@@ -22,7 +22,7 @@ int firstOccur(char * line, char  c){
 }
 
 int main(void){
-char* string = "aaaaas";
-printf("%d", firstOccur(string, 's'));
+char* string = "aa\n";
+printf("%d", strleng(string));
 
 }
