@@ -7,7 +7,8 @@ int firstOccur(char* line, char c);
 int checkSpecial(char* pattern);
 int sameChar(char* pattern);
 int dotPlus(char* pattern);
-
+int matchPatternDots(char* pattern,char* line);
+int patternPlus(char* pattern,char* line);
 /**
  * You can use this recommended helper function 
  * Returns true if partial_line matches pattern, starting from
@@ -55,14 +56,20 @@ int rgrep_matches(char *line, char *pattern){
 				
 			else if (dotPlus(pattern))
 				return 1;
+			else if (matchPatternDots(pattern, line))
+				return 1;
 			else
 				return 0;
 		case '\\' :
-			return 2;
+			return 0;
 		case '+' :
-			return 3;
+			if(n==1)
+				return 1;
+			if(patternPlus(pattern, line))
+				return 1;
+			return 0;
 		case '\?' :
-			return 4;
+			return 0;
 		default :
 			return 0;
 		}
@@ -134,6 +141,53 @@ int main(int argc, char **argv) {
     return 0;
 }
 
+int patternPlus(char* pattern,char* line){
+	int n = strleng(pattern);
+	int m = strleng(line);
+	int p = firstOccur(pattern, '+');
+	int count = 0;
+	for(int j = 0 ; j < p - 1; j++){
+			if(line[j] == pattern[j])
+				count++;
+
+				
+			
+	}
+	//printf("count: %d, line: %s\n", count, line);
+	for(int i = 0; i< m; i++){
+		if(line[i] == pattern[p-1] && n <= 2){
+			return 1;
+		}
+		if(pattern[p-1] == line[i]){
+				count++;
+				break;
+		}
+	}
+	
+	
+	//printf("count: %d,n: %d, line: %s\n", count,n,  line);
+	if(count == n-1)
+		return 1;
+	return 0;
+}
+
+
+//Checks for matchs to dot-pattern
+int matchPatternDots(char* pattern,char* line){
+	int n = strleng(pattern);
+	int m = strleng(line);
+	int count = 0;
+	for(int i = 0; i< m; i++){
+		if(line[i] == '.'  || pattern[i] == line[i]){
+				count++;
+		}
+		if(count == n)
+			return 1;
+	}
+	return 0;
+	
+}
+
 
 //Checks for a plus after dots
 int dotPlus(char* pattern){
@@ -181,7 +235,7 @@ int firstOccur(char * line, char  c){
 	}
 	return 5000;
 }
-/*Checks for any special characters not proceeded by a \(escape char)
+/*Checks for the first special character not proceeded by a \(escape char)
 returns index of special char or returns 5000
 	. = any char
 	+ = preceeding will appear any # of times
