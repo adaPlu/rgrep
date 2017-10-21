@@ -142,35 +142,82 @@ int main(int argc, char **argv) {
 }
 
 int patternPlus(char* pattern,char* line){
+ 	int n = strleng(pattern);
+ 	int m = strleng(line);
+	int firstFound[m];
+ 	int p = firstOccur(pattern, '+');
+ 	int count = 0;
+	int found = 0;
+	int index = 0;
+	//Pattern length less then = 2
+	if(n <= 2){
+		for(int i = 0; i< m; i++){
+			if(line[i] == pattern[0]){
+				found++;
+				return 1;
+			}
+		}
+	}
+	//Pattern Greater Than 2
+	else{
+		for(int i = 0; i< m; i++){
+			if(line[i] == pattern[0]){
+				firstFound[index++] = i;
+				count = 1;
+			}
+		}
+		index = 0;
+		for(int i = 1; i< n; i++){
+			if(line[i] == pattern[i]){
+				count++;
+			}
+		}
+		//printf("count: %d,n: %d, line: %s\n", count,n,  line);
+		if(count == n-1)
+			return 1;
+	
+	}
+ 	return 0;
+ }
+ 
+ /*
+int patternPlus(char* pattern,char* line){
 	int n = strleng(pattern);
 	int m = strleng(line);
-	int p = firstOccur(pattern, '+');
+	//int p = firstOccur(pattern, '+');
 	int count = 0;
-	for(int j = 0 ; j < p - 1; j++){
-			if(line[j] == pattern[j])
-				count++;
-
-				
-			
-	}
-	//printf("count: %d, line: %s\n", count, line);
-	for(int i = 0; i< m; i++){
-		if(line[i] == pattern[p-1] && n <= 2){
-			return 1;
-		}
-		if(pattern[p-1] == line[i]){
-				count++;
-				break;
+	int firstFound[m];
+	int k = 1;
+	int temp = 0;
+	//printf("%d", n);
+	if(n <= 2){
+		for(int i = 0; i< m; i++){
+			if(line[i] == pattern[0])
+				return 1;
 		}
 	}
+	else{
+		for(int j = 0; j< m; j++){
+			if(line[j] == pattern[0]){
+				firstFound[temp++] = j;
+				count = 1;
+			}
+		}
+		temp = 0;
+		for(int l = 0; l< m; l++){
+			if(firstFound[temp] == pattern[k])
+				count++;
+			if(k != n)
+				k++;
+		}
 	
-	
-	//printf("count: %d,n: %d, line: %s\n", count,n,  line);
-	if(count == n-1)
+	}
+	if(count == n)
 		return 1;
 	return 0;
+	
 }
-
+*/
 
 //Checks for matchs to dot-pattern
 int matchPatternDots(char* pattern,char* line){
@@ -223,7 +270,7 @@ int strleng(char * string){
 	return i;
 
 }
-	
+
 
 /*Returns index of first char in string that matches first char in pattern, returns 5000 if no matches*/
 int firstOccur(char * line, char  c){
