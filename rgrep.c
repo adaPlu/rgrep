@@ -10,6 +10,7 @@ int sameChar(char* pattern);
 int afterPlus(char* pattern, char* line);
 int matchPatternDots(char* pattern,char* line);
 int patternPlus(char* pattern,char* line);
+int morePlus(char* pattern,char* line);
 /**
  * You can use this recommended helper function 
  * Returns true if partial_line matches pattern, starting from
@@ -66,6 +67,8 @@ int rgrep_matches(char *line, char *pattern){
 			return 0;
 		case '+' :
 			if(n==1)
+				return 1;
+			if(morePlus(pattern, line))
 				return 1;
 			if(patternPlus(pattern, line))
 				return 1;
@@ -253,7 +256,7 @@ int sameChar(char *pattern){
 	return 0;
 }
 
-/*Custom Strlen function*/
+/* Strlen function*/
 int strleng(char * string){
 
 	int i = 0;
@@ -335,4 +338,46 @@ int checkSpecial(char* pattern){
 			
 	return 5000;
 }
+//Checks for and deals with multiple plus
+int morePlus(char* pattern,char* line){
+	int n = strleng(pattern);
+	int m = strleng(line);
+	int count = 0;
+	int plus = 0;
+	char beforePlus[n];
+	int temp = 0;
+	for(int i = 0; i  < n; i++ ){
+		if(pattern[i] == '+'){
+			plus++;
+			temp++;
+			
+		}
+		else
+			beforePlus[temp] = pattern[i];
 
+	}
+	temp = 0;
+	//printf("%c,%c, %c\n", beforePlus[0], beforePlus[1], beforePlus[2]);
+	if(plus < 2)
+		return 0;
+	else{
+		for(int i = 0; i  < n; i++ ){
+			for(int j = 0; j  < m; j++ ){
+				if (line[j] == beforePlus[i]){
+					count++;
+					break;
+					
+					
+				}
+			}
+				
+		}
+
+		//printf("count %d, plus: %d,, line: %s\n", count, plus,  line);		
+		if(count >= plus)
+			return 1;					
+		
+		
+	}
+	return 0;
+}
