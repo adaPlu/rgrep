@@ -223,17 +223,20 @@ int afterPlus(char* pattern, char* line){
 	int count= 0;
 	int i = 0;
 	for(int j = 0; j < m; j++){
-		if(pattern[i] == line[j] || pattern[i] == '+'|| pattern[i] == '.')
+		if(pattern[i] == line[j] || pattern[i] == '+'|| pattern[i] == '.'){
 			count++;
-		if (i != n)
-			i++;
+			if (i != n){
+				i++;
+		
+			}
+		}
 	}
 	
 	//printf("count: %d,n: %d, line: %s\n", count,n,  line);
-	if(count == n- 1 || count == n)
+	if(count == n- 1||  count == n){
 		return 1;
-	else	
-		return 0;
+	}
+	return 0;
 }
 
 //Checks if pattern is all the same
@@ -254,7 +257,7 @@ int sameChar(char *pattern){
 int strleng(char * string){
 
 	int i = 0;
-	while(string[i] != '\0'){
+	while(string[i] != '\0' && string[i] != '\n'){
 		i++;
 	}
 	return i;
