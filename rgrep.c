@@ -198,7 +198,44 @@ int patternPlus(char* pattern,char* line){
  	return 0;
  }
  
+ 
+/*
+//Checks for matchs to dot-pattern
+int matchPatternDots(char* pattern,char* line){
+	int n = strleng(pattern);
+	int m = strleng(line);
+	int count = 0;
+	int dots = 0;
+	int temp = 0;
+	if(pattern[0] == '.')
+		while(pattern[temp] == '.'){
+			temp++;
+			dots++;
+		}
+	else{
+		for(int i = 0; i< n; i++){
+			if(pattern[i] == '.'){
+				dots++;
+			}
+		}
+	}
+	
+	for(int i = 0; i< n; i++){	
+		for(int j = 0; j< m; j++){	
+			if((pattern[i] != '\0') && (pattern[i] == line[j]) && (pattern[i] != '.')){
+				count++;
+			}
+		}
+		
+	}
+	//printf("count: %d,n: %d\n", count,n-dots);
+	if(count >= n- dots && strleng(line) >= strleng(pattern))
+		return 1;
 
+	return 0;
+	
+}
+*/
 //Checks for matchs to dot-pattern
 int matchPatternDots(char* pattern,char* line){
 	int n = strleng(pattern);
