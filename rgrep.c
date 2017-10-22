@@ -4,9 +4,10 @@
 //Funtions
 int strleng(char* string);
 int firstOccur(char* line, char c);
+int secondOccur(char* line, char c);
 int checkSpecial(char* pattern);
 int sameChar(char* pattern);
-int dotPlus(char* pattern);
+int afterPlus(char* pattern, char* line);
 int matchPatternDots(char* pattern,char* line);
 int patternPlus(char* pattern,char* line);
 /**
@@ -53,8 +54,9 @@ int rgrep_matches(char *line, char *pattern){
 					return 1;	
 				else
 					return 0;
-				
-			else if (dotPlus(pattern))
+			else if (n==2)
+				return 1;
+			else if (afterPlus(pattern, line))
 				return 1;
 			else if (matchPatternDots(pattern, line))
 				return 1;
@@ -144,11 +146,11 @@ int main(int argc, char **argv) {
 int patternPlus(char* pattern,char* line){
  	int n = strleng(pattern);
  	int m = strleng(line);
-	int firstFound[m];
+	//int firstFound[m];
  	int p = firstOccur(pattern, '+');
  	int count = 0;
 	int found = 0;
-	int index = 0;
+	//int index = 0;
 	//Pattern length less then = 2
 	if(n <= 2){
 		for(int i = 0; i< m; i++){
@@ -160,72 +162,50 @@ int patternPlus(char* pattern,char* line){
 	}
 	//Pattern Greater Than 2
 	else{
+		//char p1 = pattern[p-1];
 		for(int i = 0; i< m; i++){
 			if(line[i] == pattern[0]){
-				firstFound[index++] = i;
+				//firstFound[index++] = i;
 				count = 1;
 			}
 		}
-		index = 0;
+		//index = 0;
 		for(int i = 1; i< n; i++){
 			if(line[i] == pattern[i]){
 				count++;
 			}
 		}
+		
+		if(p < n){
+			char p2 = pattern[p+1];
+			for(int i = p+1; i< n && i < m; i++){
+				//printf("p2: %d\n", line[firstOccur(line, p2)] == pattern[i]);
+				if(line[firstOccur(line, p2)] == pattern[i]){
+					//printf("p: %d,n: %d, line: %s\n", p,n,  line);
+					count++;
+					//printf("count: %d,n: %d, line: %s\n", count,n,  line);
+				}
+			}
+		}
 		//printf("count: %d,n: %d, line: %s\n", count,n,  line);
-		if(count == n-1)
+		if(count == n-1 || count == n)
 			return 1;
 	
 	}
  	return 0;
  }
  
- /*
-int patternPlus(char* pattern,char* line){
-	int n = strleng(pattern);
-	int m = strleng(line);
-	//int p = firstOccur(pattern, '+');
-	int count = 0;
-	int firstFound[m];
-	int k = 1;
-	int temp = 0;
-	//printf("%d", n);
-	if(n <= 2){
-		for(int i = 0; i< m; i++){
-			if(line[i] == pattern[0])
-				return 1;
-		}
-	}
-	else{
-		for(int j = 0; j< m; j++){
-			if(line[j] == pattern[0]){
-				firstFound[temp++] = j;
-				count = 1;
-			}
-		}
-		temp = 0;
-		for(int l = 0; l< m; l++){
-			if(firstFound[temp] == pattern[k])
-				count++;
-			if(k != n)
-				k++;
-		}
-	
-	}
-	if(count == n)
-		return 1;
-	return 0;
-	
-}
-*/
 
 //Checks for matchs to dot-pattern
 int matchPatternDots(char* pattern,char* line){
 	int n = strleng(pattern);
 	int m = strleng(line);
+	int index = 0;
 	int count = 0;
 	for(int i = 0; i< m; i++){
-		if(line[i] == '.'  || pattern[i] == line[i]){
+		while(pattern[index] == '.')
+			index++;
+		if(pattern[index] != '\0' && pattern[index++] == line[i]){
 				count++;
 		}
 		if(count == n)
@@ -236,14 +216,24 @@ int matchPatternDots(char* pattern,char* line){
 }
 
 
-//Checks for a plus after dots
-int dotPlus(char* pattern){
+//Checks for matches after +
+int afterPlus(char* pattern, char* line){
 	int n = strleng(pattern);
-	for(int i = 1; i< n; i++){
-		if(pattern[i] == '+')
-			return 1;
+	int m = strleng(line);
+	int count= 0;
+	int i = 0;
+	for(int j = 0; j < m; j++){
+		if(pattern[i] == line[j] || pattern[i] == '+'|| pattern[i] == '.')
+			count++;
+		if (i != n)
+			i++;
 	}
-	return 0;
+	
+	//printf("count: %d,n: %d, line: %s\n", count,n,  line);
+	if(count == n- 1 || count == n)
+		return 1;
+	else	
+		return 0;
 }
 
 //Checks if pattern is all the same
@@ -272,12 +262,27 @@ int strleng(char * string){
 }
 
 
-/*Returns index of first char in string that matches first char in pattern, returns 5000 if no matches*/
+/*Returns index of first char in string that matches char, returns 5000 if no matches*/
 int firstOccur(char * line, char  c){
 	int n  = strleng(line);
 	for(int i = 0; i < n; i++){
 			if(line[i] == c)
 				return i;
+		
+	}
+	return 5000;
+}
+
+/*Returns index of second char in string that matches char , returns 5000 if no matches*/
+int secondOccur(char* line, char c){
+	int n  = strleng(line);
+	int count = 0;
+	for(int i = 0; i < n; i++){
+			if(line[i] == c)
+				count++;
+			if(count == 2)
+				return i;
+			
 		
 	}
 	return 5000;
