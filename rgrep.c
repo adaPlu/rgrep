@@ -11,6 +11,8 @@ int afterPlus(char* pattern, char* line);
 int matchPatternDots(char* pattern,char* line);
 int patternPlus(char* pattern,char* line);
 int morePlus(char* pattern,char* line);
+int basic(char* pattern,char* line, int n, int m);
+int quesMark(char * pattern, char* line);
 /**
  * You can use this recommended helper function 
  * Returns true if partial_line matches pattern, starting from
@@ -64,6 +66,7 @@ int rgrep_matches(char *line, char *pattern){
 			else
 				return 0;
 		case '\\' :
+		
 			return 0;
 		case '+' :
 			if(n==1)
@@ -73,48 +76,19 @@ int rgrep_matches(char *line, char *pattern){
 			if(patternPlus(pattern, line))
 				return 1;
 			return 0;
-		case '\?' :
-			return 0;
+		case '?' :
+			if(quesMark(pattern, line))
+				return 1;
+			else
+				return 0;
 		default :
 			return 0;
 		}
 
 	}
 	else{
-		int matches = 0;
-		int index = firstOccur(line, pattern[0]);
-		//If pattern is empty string, prints all lines
-		if(n == 0){
+		if(basic(line , pattern, n, m))
 			return 1;
-		//If pattern is length one char and no special chars.
-		}
-		else if(n==1){
-			if(index != 5000){
-				/*check for next letter in pattern in line*/
-				return 1;
-			}
-		}
-		//If pattern length > 1 and no special chars.
-		else if (n > 1){
-			if(index != 5000){
-				matches++;
-				/*check for next letter in pattern in line*/
-					for(int i = 1, l = strleng(line); i < l; i++){
-						if(pattern[i] == line[index + i]){
-							matches++;
-							if(matches == n){
-								return 1;
-							}
-						}
-						else
-							return 0;
-					}
-			}
-			else
-				return 0;
-				
-		}
-		return 0;
 	}
 	return 0;
 }
@@ -245,9 +219,10 @@ int matchPatternDots(char* pattern,char* line){
 	for(int i = 0; i< m; i++){
 		while(pattern[index] == '.')
 			index++;
-		if(pattern[index] != '\0' && pattern[index++] == line[i]){
+		if((pattern[index] != '\0' && pattern[index] == line[i]) || (pattern[index] != '\0' && pattern[index++] == '.')){
 				count++;
 		}
+		//printf("count: %d,n: %d, line: %s\n", count,n,  line);
 		if(count == n)
 			return 1;
 	}
@@ -294,10 +269,10 @@ int sameChar(char *pattern){
 }
 
 /* Strlen function*/
-int strleng(char * string){
+int strleng(char* string){
 
 	int i = 0;
-	while(string[i] != '\0' && string[i] != '\n'){
+	while(string[i] != '\0' && string[i] != '\n'&& string[i] != '\r'){
 		i++;
 	}
 	return i;
@@ -417,4 +392,70 @@ int morePlus(char* pattern,char* line){
 		
 	}
 	return 0;
+}
+
+int quesMark(char * pattern, char* line){
+	int n = strleng(pattern);
+	int m = strleng(line);
+	if(m == 0)
+		return 0;
+	int q = firstOccur(pattern, '?');
+	//char beforeQ;
+	//char* before;
+	//char* after;
+	char newPat[n + 1];
+	for(int i = 0; i < n + 1; i++){
+		if(i == n)
+			newPat[i] = '\0';
+		else if(pattern[i] == '?'&& pattern[i-1] != '\\')
+			newPat[i] = '.';
+		else
+			newPat[i] = pattern[i];
+	}
+	//printf("%s\n", newPat);
+	if(q != 5000){
+		//printf("%s, %s\n", newPat, line);
+		if(matchPatternDots(newPat, line))
+			return 1;
+	}
+	
+	return 0;
+}
+
+/*Non special char rgrep*/
+int basic(char* line , char* pattern, int n, int m){
+		int matches = 0;
+		int index = firstOccur(line, pattern[0]);
+		//If pattern is empty string, prints all lines
+		if(n == 0){
+			return 1;
+		//If pattern is length one char and no special chars.
+		}
+		else if(n==1){
+			if(index != 5000){
+				/*check for next letter in pattern in line*/
+				return 1;
+			}
+		}
+		//If pattern length > 1 and no special chars.
+		else if (n > 1){
+			if(index != 5000){
+				matches++;
+				/*check for next letter in pattern in line*/
+					for(int i = 1, l = strleng(line); i < l; i++){
+						if(pattern[i] == line[index + i]){
+							matches++;
+							if(matches == n){
+								return 1;
+							}
+						}
+						else
+							return 0;
+					}
+			}
+			else
+				return 0;
+				
+		}
+		return 0;
 }
