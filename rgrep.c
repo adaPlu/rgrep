@@ -13,6 +13,11 @@ int patternPlus(char* pattern,char* line);
 int morePlus(char* pattern,char* line);
 int basic(char* pattern,char* line, int n, int m);
 int quesMark(char * pattern, char* line);
+int escapeChar(char* pattern,char* line);
+int matchOne(char* pattern,char* line);
+int strlengn(char* string);
+char** breakUpString(char* line);
+int dotSlash(char* pattern,char* line);
 /**
  * You can use this recommended helper function 
  * Returns true if partial_line matches pattern, starting from
@@ -49,25 +54,42 @@ int matches_leading(char *partial_line, char *pattern) {
 int rgrep_matches(char *line, char *pattern){
 	int n = strleng(pattern);
 	int m = strleng(line);
+	//char** str;
+	//str = breakUpString(line);
+	//printf("%s %s", str[0], str[1]);
 	if(checkSpecial(pattern) != 5000){
 		switch(pattern[checkSpecial(pattern)]) {
 		case '.' :
-			if(sameChar(pattern))
-				if(m - 1 == n)
+			if(sameChar(pattern)){
+				if(m == n)
 					return 1;	
 				else
 					return 0;
-			else if (n==2)
+			}
+			else if(firstOccur(pattern, '\\') != 5000){
+				if (dotSlash(pattern, line)){
+					return 1;
+				}
+				return 0;
+			}
+			else if(firstOccur(pattern, '+') != 5000){
+				if (afterPlus(pattern, line)){
+					//printf("Plus");
+					return 1;
+				}
+				return 0;
+			}
+			else if (matchPatternDots(pattern, line)){
+				//printf("match");
 				return 1;
-			else if (afterPlus(pattern, line))
-				return 1;
-			else if (matchPatternDots(pattern, line))
-				return 1;
+			}
 			else
 				return 0;
 		case '\\' :
-		
-			return 0;
+				if(escapeChar(pattern, line))
+					return 1;
+				else
+					return 0;
 		case '+' :
 			if(n==1)
 				return 1;
@@ -125,7 +147,7 @@ int patternPlus(char* pattern,char* line){
  	int m = strleng(line);
 	//int firstFound[m];
  	int p = firstOccur(pattern, '+');
- 	int count = 0;
+ 	int matches = 0;
 	int found = 0;
 	//int index = 0;
 	//Pattern length less then = 2
@@ -143,13 +165,13 @@ int patternPlus(char* pattern,char* line){
 		for(int i = 0; i< m; i++){
 			if(line[i] == pattern[0]){
 				//firstFound[index++] = i;
-				count = 1;
+				matches = 1;
 			}
 		}
 		//index = 0;
 		for(int i = 1; i< n; i++){
 			if(line[i] == pattern[i]){
-				count++;
+				matches++;
 			}
 		}
 		
@@ -159,13 +181,13 @@ int patternPlus(char* pattern,char* line){
 				//printf("p2: %d\n", line[firstOccur(line, p2)] == pattern[i]);
 				if(line[firstOccur(line, p2)] == pattern[i]){
 					//printf("p: %d,n: %d, line: %s\n", p,n,  line);
-					count++;
-					//printf("count: %d,n: %d, line: %s\n", count,n,  line);
+					matches++;
+					//printf("matches: %d,n: %d, line: %s\n", matches,n,  line);
 				}
 			}
 		}
-		//printf("count: %d,n: %d, line: %s\n", count,n,  line);
-		if(count == n-1 || count == n)
+		//printf("matches: %d,n: %d, line: %s\n", matches,n,  line);
+		if(matches == n-1 || matches == n)
 			return 1;
 	
 	}
@@ -173,57 +195,30 @@ int patternPlus(char* pattern,char* line){
  }
  
  
-/*
-//Checks for matchs to dot-pattern
-int matchPatternDots(char* pattern,char* line){
-	int n = strleng(pattern);
-	int m = strleng(line);
-	int count = 0;
-	int dots = 0;
-	int temp = 0;
-	if(pattern[0] == '.')
-		while(pattern[temp] == '.'){
-			temp++;
-			dots++;
-		}
-	else{
-		for(int i = 0; i< n; i++){
-			if(pattern[i] == '.'){
-				dots++;
-			}
-		}
-	}
-	
-	for(int i = 0; i< n; i++){	
-		for(int j = 0; j< m; j++){	
-			if((pattern[i] != '\0') && (pattern[i] == line[j]) && (pattern[i] != '.')){
-				count++;
-			}
-		}
-		
-	}
-	//printf("count: %d,n: %d\n", count,n-dots);
-	if(count >= n- dots && strleng(line) >= strleng(pattern))
-		return 1;
-
-	return 0;
-	
-}
-*/
 //Checks for matchs to dot-pattern
 int matchPatternDots(char* pattern,char* line){
 	int n = strleng(pattern);
 	int m = strleng(line);
 	int index = 0;
-	int count = 0;
+	int matches = 0;
 	for(int i = 0; i< m; i++){
-		while(pattern[index] == '.')
+		
+		/*
+		while(pattern[index] == '.'){
 			index++;
-		if((pattern[index] != '\0' && pattern[index] == line[i]) || (pattern[index] != '\0' && pattern[index++] == '.')){
-				count++;
+			matches++;
+			printf("matches: %d", matches);
 		}
-		//printf("count: %d,n: %d, line: %s\n", count,n,  line);
-		if(count == n)
+		*/
+		//printf("matches: %d", matches);
+		if((pattern[index] != '\0' && pattern[index] == line[i]) || pattern[index] == '.'){
+				matches++;
+				index++;
+				
+		}
+		
+		//printf("matches: %d,n: %d, line: %s\n", matches, n,  line);
+		if(matches == n)
 			return 1;
 	}
 	return 0;
@@ -233,22 +228,42 @@ int matchPatternDots(char* pattern,char* line){
 
 //Checks for matches after +
 int afterPlus(char* pattern, char* line){
-	int n = strleng(pattern);
+	int n = strlengn(pattern);
 	int m = strleng(line);
-	int count= 0;
+	int matches= 0;
 	int i = 0;
+	//printf("%d,%d, %s\n", m,n, line);
 	for(int j = 0; j < m; j++){
-		if(pattern[i] == line[j] || pattern[i] == '+'|| pattern[i] == '.'){
-			count++;
+		//printf("line[i]: %c, pattern[i]:%c\n", line[i], pattern[i]);
+		if(pattern[i] == '\\'){
+			if(i+2 < m && pattern[i+1] == 'n'){
+				i = i+2;
+		}}
+		
+		if((i+1 > m && pattern[i] == line[j]) || (pattern[i] == '+' && pattern[i+1] != '\\')|| (pattern[i] == '.'&& pattern[i+1] != '\\')){
+			matches++;
+			//printf("matches: %d, %c\n", matches, pattern[i]);
 			if (i != n){
+				i++;
+		
+			}
+		}
+		else if(pattern[i] == line[j] || pattern[i] == '+'|| pattern[i] == '.'){
+			matches++;
+			 //printf("matches: %d, %c\n", matches, pattern[i]);
+			if(line[i] == '\n'){
+				line[i] = '\0';
+				//printf("line: %s, %c\n", line, pattern[i]);
+			}
+			else if (i != n){
 				i++;
 		
 			}
 		}
 	}
 	
-	//printf("count: %d,n: %d, line: %s\n", count,n,  line);
-	if(count == n- 1||  count == n){
+	//printf("matches: %d,n: %d,%d, line: %s\n", matches ,n, m,  line);
+	if(matches == n- 1||  matches == n){
 		return 1;
 	}
 	return 0;
@@ -278,7 +293,21 @@ int strleng(char* string){
 	return i;
 
 }
+//only \0
+int strlengn(char* string){
 
+	int i = 0;
+	int count = 0;
+	while(string[i] != '\0'){
+		i++;
+		count++;
+		if(string[i] == '\\'){
+			count--;
+		}
+	}
+	return count;
+
+}
 
 /*Returns index of first char in string that matches char, returns 5000 if no matches*/
 int firstOccur(char * line, char  c){
@@ -294,11 +323,11 @@ int firstOccur(char * line, char  c){
 /*Returns index of second char in string that matches char , returns 5000 if no matches*/
 int secondOccur(char* line, char c){
 	int n  = strleng(line);
-	int count = 0;
+	int matches = 0;
 	for(int i = 0; i < n; i++){
 			if(line[i] == c)
-				count++;
-			if(count == 2)
+				matches++;
+			if(matches == 2)
 				return i;
 			
 		
@@ -346,7 +375,19 @@ int checkSpecial(char* pattern){
 			else
 				return i;
 		}
-	}	
+	}
+
+	//checks for '\\'
+	for(int i = 0; i < n; i++){
+		if(pattern[i] == '\\'){
+			if(i != 0 && pattern[i-1] != 92){
+				return i;
+				
+			}
+			else
+				return i;
+		}
+	}
 			
 	return 5000;
 }
@@ -354,7 +395,7 @@ int checkSpecial(char* pattern){
 int morePlus(char* pattern,char* line){
 	int n = strleng(pattern);
 	int m = strleng(line);
-	int count = 0;
+	int matches = 0;
 	int plus = 0;
 	char beforePlus[n];
 	int temp = 0;
@@ -376,7 +417,7 @@ int morePlus(char* pattern,char* line){
 		for(int i = 0; i  < n; i++ ){
 			for(int j = 0; j  < m; j++ ){
 				if (line[j] == beforePlus[i]){
-					count++;
+					matches++;
 					break;
 					
 					
@@ -385,8 +426,8 @@ int morePlus(char* pattern,char* line){
 				
 		}
 
-		//printf("count %d, plus: %d,, line: %s\n", count, plus,  line);		
-		if(count >= plus)
+		//printf("matches %d, plus: %d,, line: %s\n", matches, plus,  line);		
+		if(matches >= plus)
 			return 1;					
 		
 		
@@ -400,29 +441,88 @@ int quesMark(char * pattern, char* line){
 	if(m == 0)
 		return 0;
 	int q = firstOccur(pattern, '?');
-	//char beforeQ;
-	//char* before;
-	//char* after;
-	char newPat[n + 1];
-	for(int i = 0; i < n + 1; i++){
-		if(i == n)
-			newPat[i] = '\0';
-		else if(pattern[i] == '?'&& pattern[i-1] != '\\')
-			newPat[i] = '.';
+	char newPat[n];
+	char newPat2[n-1];
+	int index = 0;
+	int index2 = 0;
+	//printf("%d\n", n);
+	for(int i = 0; i < n; i++){
+		if(i== n-1){
+			newPat2[index2] = '\0';
+		}
+		if(pattern[i] != '?' && pattern[i+1] != '?')
+			newPat2[index2++] = pattern[i];
+		
+		if(i == n){
+			newPat[index] = '\0';
+			//printf("n== 2 ,%s\n", newPat);
+		}
+		else if(i+1< n && pattern[i+1] == '?'&& pattern[i] != '\\'){
+			newPat[index++] = '.';
+
+		}
+		else if(pattern[i] == '?'){
+			if(pattern[i+1] != '\0')
+				newPat[index++] = pattern[i+1];
+			else
+				newPat[i] = '\0';
+
+		}
+		else if(i == n-1)
+			newPat[index] = '\0';
 		else
-			newPat[i] = pattern[i];
+			newPat[index++] = pattern[i];
+			
 	}
-	//printf("%s\n", newPat);
+
+	//printf("%s, %s\n, %s", newPat2, newPat, line);
 	if(q != 5000){
-		//printf("%s, %s\n", newPat, line);
+		//printf("%s, %s, %d\n", newPat2, line, basic(line, newPat2, n, m) );
+		//printf("%d, %s, %s \n", matchOne(newPat2,line), newPat2, line);
+		
+		if(n<=3){
+			if(matchOne(newPat2,line))
+			return 1;
+		}
 		if(matchPatternDots(newPat, line))
 			return 1;
+
 	}
 	
 	return 0;
 }
 
-/*Non special char rgrep*/
+int escapeChar(char* pattern,char* line){
+	int n = strleng(pattern);
+	int m = strleng(line);
+	int index = 0;
+	int matches = 0;
+	for(int i = 0; i < m; i++){
+		if(line[i] == pattern[index]){
+			matches++;
+			if(index < n)
+				index++;
+		}
+		
+	}
+	//printf("matches: %d,n: %d, line: %s\n", matches,n, line);
+	if(matches == n)
+		return 1;
+	return 0;
+}
+
+//Finds matches to patterns of one letter
+int matchOne(char* pattern,char* line){
+	int m = strleng(line);
+	for(int i = 0; i < m; i++){
+		//printf("%s", pattern);
+		if(line[i] == pattern[0])
+			return 1;
+	}
+	return 0;
+}
+
+/*Non special char rgrep; n strleng of pattern, m strleng of line*/
 int basic(char* line , char* pattern, int n, int m){
 		int matches = 0;
 		int index = firstOccur(line, pattern[0]);
@@ -445,6 +545,7 @@ int basic(char* line , char* pattern, int n, int m){
 					for(int i = 1, l = strleng(line); i < l; i++){
 						if(pattern[i] == line[index + i]){
 							matches++;
+							//printf("matches: %d,n: %d, line: %s\n", matches,n, line);
 							if(matches == n){
 								return 1;
 							}
@@ -458,4 +559,34 @@ int basic(char* line , char* pattern, int n, int m){
 				
 		}
 		return 0;
+}
+
+
+int dotSlash(char* pattern,char* line){
+	int n = strleng(pattern);
+	//int m = strleng(pattern);
+	char newPat[n];
+	int index= 0;
+	
+	for(int i = 0; i < n; i++){
+		if(i == n){
+			newPat[index] = '\0';
+			//printf("n== 2 ,%s\n", newPat);
+		}
+		else if(i+1< n && pattern[i+1] != 'n'&& pattern[i] != '\\'){
+			newPat[index++] = pattern[i];
+
+		}
+		else if(i == n-1)
+			newPat[index] = '\0';
+	
+			
+	}
+
+	//printf(" %s, %s", newPat, line);
+	if(matchPatternDots(newPat, line))
+			return 1;
+	
+	
+	return 0;
 }
