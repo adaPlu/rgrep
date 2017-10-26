@@ -16,8 +16,7 @@ int quesMark(char * pattern, char* line);
 int escapeChar(char* pattern,char* line);
 int matchOne(char* pattern,char* line);
 int strlengn(char* string);
-char** breakUpString(char* line);
-int dotSlash(char* pattern,char* line);
+int dotSlashn(char* pattern,char* line);
 /**
  * You can use this recommended helper function 
  * Returns true if partial_line matches pattern, starting from
@@ -54,9 +53,6 @@ int matches_leading(char *partial_line, char *pattern) {
 int rgrep_matches(char *line, char *pattern){
 	int n = strleng(pattern);
 	int m = strleng(line);
-	//char** str;
-	//str = breakUpString(line);
-	//printf("%s %s", str[0], str[1]);
 	if(checkSpecial(pattern) != 5000){
 		switch(pattern[checkSpecial(pattern)]) {
 		case '.' :
@@ -66,13 +62,16 @@ int rgrep_matches(char *line, char *pattern){
 				else
 					return 0;
 			}
-			else if(firstOccur(pattern, '\\') != 5000){
-				if (dotSlash(pattern, line)){
+			//printf("%d", firstOccur(line, '\n'));
+			else if(firstOccur(line, '\n') != 5000 && firstOccur(line, '\n') < n){
+				printf("\\n");
+				if (dotSlashn(pattern, line)){
 					return 1;
 				}
 				return 0;
 			}
 			else if(firstOccur(pattern, '+') != 5000){
+				//printf("Plus");
 				if (afterPlus(pattern, line)){
 					//printf("Plus");
 					return 1;
@@ -283,7 +282,7 @@ int sameChar(char *pattern){
 	return 0;
 }
 
-/* Strlen function*/
+/* Strlen function ignoring \n and \r*/
 int strleng(char* string){
 
 	int i = 0;
@@ -293,7 +292,23 @@ int strleng(char* string){
 	return i;
 
 }
-//only \0
+
+/* Strlen function*/
+int strlengp(char* string){
+
+	int i = 0;
+	int count = 0;
+	while(string[i] != '\0'){
+		i++;
+		count++;
+		if(string[i] == '\\'){
+			count--;
+		}
+	}
+	return count;
+
+}
+/* Strlen function ignoring \\*/
 int strlengn(char* string){
 
 	int i = 0;
@@ -311,9 +326,9 @@ int strlengn(char* string){
 
 /*Returns index of first char in string that matches char, returns 5000 if no matches*/
 int firstOccur(char * line, char  c){
-	int n  = strleng(line);
+	int n  = strlengp(line);
 	for(int i = 0; i < n; i++){
-			if(line[i] == c)
+			if(i-1 < n && line[i] == c && line[i-1] != '\\')
 				return i;
 		
 	}
@@ -376,6 +391,7 @@ int checkSpecial(char* pattern){
 				return i;
 		}
 	}
+	
 
 	//checks for '\\'
 	for(int i = 0; i < n; i++){
@@ -386,7 +402,7 @@ int checkSpecial(char* pattern){
 			}
 			else
 				return i;
-		}
+		} 
 	}
 			
 	return 5000;
@@ -562,10 +578,37 @@ int basic(char* line , char* pattern, int n, int m){
 }
 
 
-int dotSlash(char* pattern,char* line){
-	int n = strleng(pattern);
+int dotSlashn(char* pattern,char* line){
+	int n = strlengp(line);
 	//int m = strleng(pattern);
-	char newPat[n];
+	int index = 0;
+	int matches = 0;
+	int num = 0;
+	//printf("%s\n", line);
+	for(int i = 0; i < n; i++){
+		
+			//printf("%d, %d\n", n, num);
+		if(line[index] == '\n'){
+			index++;
+			num++;
+			//printf("%d\n", num);
+		}
+		if(line[i] == pattern[index]){
+			matches++;
+			index++;
+		}
+		else if(pattern[index] == '.'){
+				index++;
+		}
+	}
+	//printf("matches: %d,n-num: %d, line: %s\n", matches,n-num, line);
+	if(matches == n- num)
+		return 1;
+	
+	return 0;
+}
+/*
+char newPat[n];
 	int index= 0;
 	
 	for(int i = 0; i < n; i++){
@@ -583,10 +626,9 @@ int dotSlash(char* pattern,char* line){
 			
 	}
 
-	//printf(" %s, %s", newPat, line);
+	printf(" %s, %s", newPat, line);
 	if(matchPatternDots(newPat, line))
 			return 1;
 	
-	
-	return 0;
-}
+
+*/
