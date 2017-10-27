@@ -17,7 +17,9 @@ int escapeChar(char* pattern,char* line);
 int matchOne(char* pattern,char* line);
 int strlengn(char* string);
 int dotSlashn(char* pattern,char* line);
+char *zstring_remove_chr(char *str,const char *bad);
 /**
+
  * You can use this recommended helper function 
  * Returns true if partial_line matches pattern, starting from
  * the first char of partial_line.
@@ -53,6 +55,9 @@ int matches_leading(char *partial_line, char *pattern) {
 int rgrep_matches(char *line, char *pattern){
 	int n = strleng(pattern);
 	int m = strleng(line);
+	//zstring_remove_chr(line,"\n");
+	printf("%s", line);
+	return 0;
 	if(checkSpecial(pattern) != 5000){
 		switch(pattern[checkSpecial(pattern)]) {
 		case '.' :
@@ -64,7 +69,7 @@ int rgrep_matches(char *line, char *pattern){
 			}
 			//printf("%d", firstOccur(line, '\n'));
 			else if(firstOccur(line, '\n') != 5000 && firstOccur(line, '\n') < n){
-				printf("\\n");
+				//printf("\\n");
 				if (dotSlashn(pattern, line)){
 					return 1;
 				}
@@ -215,7 +220,11 @@ int matchPatternDots(char* pattern,char* line){
 				index++;
 				
 		}
-		
+		//printf("line[i]: %c\n",line[i]);
+		if(line[i]=='\n'){
+			matches =0;
+			printf("matches: %d,n: %d, line: %s\n", matches, n,  line);
+		}
 		//printf("matches: %d,n: %d, line: %s\n", matches, n,  line);
 		if(matches == n)
 			return 1;
@@ -607,28 +616,25 @@ int dotSlashn(char* pattern,char* line){
 	
 	return 0;
 }
-/*
-char newPat[n];
-	int index= 0;
-	
-	for(int i = 0; i < n; i++){
-		if(i == n){
-			newPat[index] = '\0';
-			//printf("n== 2 ,%s\n", newPat);
-		}
-		else if(i+1< n && pattern[i+1] != 'n'&& pattern[i] != '\\'){
-			newPat[index++] = pattern[i];
+int zstring_search_chr(const char *token,char s){
+    if (!token || s=='\0')
+        return 0;
 
-		}
-		else if(i == n-1)
-			newPat[index] = '\0';
-	
-			
-	}
+    for (;*token; token++)
+        if (*token == s)
+            return 1;
 
-	printf(" %s, %s", newPat, line);
-	if(matchPatternDots(newPat, line))
-			return 1;
-	
+    return 0;
+}
 
-*/
+char *zstring_remove_chr(char *str,const char *bad) {
+    char *src = str , *dst = str;
+    while(*src)
+        if(zstring_search_chr(bad,*src))
+            src++;
+        else
+            *dst++ = *src++;  /* assign first, then incement */
+
+    *dst='\0';
+        return str;
+}
