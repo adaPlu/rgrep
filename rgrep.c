@@ -67,22 +67,21 @@ int rgrep_matches(char *line, char *pattern){
 			}
 			//printf("%d", firstOccur(line, '\n'));
 			else if(firstOccur(line, '\n') != 5000 && firstOccur(line, '\n') < n){
-				printf("\\n");
+				//printf("\\n");
 				if (dotSlashn(pattern, line)){
 					return 1;
 				}
 				return 0;
 			}
 			else if(firstOccur(pattern, '+') != 5000){
-				printf("Plus");
+				//printf("Plus");
 				if (afterPlus(pattern, line)){
-					printf("Plus");
 					return 1;
 				}
 				return 0;
 			}
 			else if (matchPatternDots(pattern, line)){
-				printf("match");
+				//printf("match");
 				return 1;
 			}
 			else
