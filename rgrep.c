@@ -17,7 +17,6 @@ int escapeChar(char* pattern,char* line);
 int matchOne(char* pattern,char* line);
 int strlengn(char* string);
 int dotSlashn(char* pattern,char* line);
-char *zstring_remove_chr(char *str,const char *bad);
 /**
 
  * You can use this recommended helper function 
@@ -55,9 +54,8 @@ int matches_leading(char *partial_line, char *pattern) {
 int rgrep_matches(char *line, char *pattern){
 	int n = strleng(pattern);
 	int m = strleng(line);
-	//zstring_remove_chr(line,"\n");
-	printf("%s", line);
-	return 0;
+	//printf("%c", pattern[checkSpecial(pattern)]);
+	//return 0;
 	if(checkSpecial(pattern) != 5000){
 		switch(pattern[checkSpecial(pattern)]) {
 		case '.' :
@@ -69,31 +67,40 @@ int rgrep_matches(char *line, char *pattern){
 			}
 			//printf("%d", firstOccur(line, '\n'));
 			else if(firstOccur(line, '\n') != 5000 && firstOccur(line, '\n') < n){
-				//printf("\\n");
+				printf("\\n");
 				if (dotSlashn(pattern, line)){
 					return 1;
 				}
 				return 0;
 			}
 			else if(firstOccur(pattern, '+') != 5000){
-				//printf("Plus");
+				printf("Plus");
 				if (afterPlus(pattern, line)){
-					//printf("Plus");
+					printf("Plus");
 					return 1;
 				}
 				return 0;
 			}
 			else if (matchPatternDots(pattern, line)){
-				//printf("match");
+				printf("match");
 				return 1;
 			}
 			else
 				return 0;
 		case '\\' :
-				if(escapeChar(pattern, line))
+			//printf("slash");
+			if(firstOccur(pattern, '?') != 5000 && pattern[(firstOccur(pattern, '?'))-1] == '\\'){
+				pattern = "?";
+				if(basic(pattern, line, 1, m))
 					return 1;
 				else
 					return 0;
+			}
+			else
+				if(escapeChar(pattern, line))
+						return 1;
+					else
+						return 0;
 		case '+' :
 			if(n==1)
 				return 1;
@@ -113,7 +120,7 @@ int rgrep_matches(char *line, char *pattern){
 
 	}
 	else{
-		if(basic(line , pattern, n, m))
+		if(basic(pattern , line, n, m))
 			return 1;
 	}
 	return 0;
@@ -367,6 +374,18 @@ returns index of special char or returns 5000
 	
 int checkSpecial(char* pattern){
 	int n = strleng(pattern);
+	
+	//checks for '\\'
+	for(int i = 0; i < n; i++){
+		if(pattern[i] == '\\'){
+			if(i != 0 && pattern[i-1] != 92){
+				return i;
+				
+			}
+			else
+				return i;
+		} 
+	}
 	//checks for .
 	for(int i = 0; i < n; i++){
 		if(pattern[i] == '.'){
@@ -399,21 +418,7 @@ int checkSpecial(char* pattern){
 			else
 				return i;
 		}
-	}
-	
-
-	//checks for '\\'
-	for(int i = 0; i < n; i++){
-		if(pattern[i] == '\\'){
-			if(i != 0 && pattern[i-1] != 92){
-				return i;
-				
-			}
-			else
-				return i;
-		} 
-	}
-			
+	}	
 	return 5000;
 }
 //Checks for and deals with multiple plus
@@ -548,14 +553,14 @@ int matchOne(char* pattern,char* line){
 }
 
 /*Non special char rgrep; n strleng of pattern, m strleng of line*/
-int basic(char* line , char* pattern, int n, int m){
+int basic(char* pattern , char* line, int n, int m){
 		int matches = 0;
 		int index = firstOccur(line, pattern[0]);
 		//If pattern is empty string, prints all lines
 		if(n == 0){
 			return 1;
-		//If pattern is length one char and no special chars.
 		}
+		//If pattern is length one char and no special chars.
 		else if(n==1){
 			if(index != 5000){
 				/*check for next letter in pattern in line*/
@@ -596,12 +601,14 @@ int dotSlashn(char* pattern,char* line){
 	//printf("%s\n", line);
 	for(int i = 0; i < n; i++){
 		
-			//printf("%d, %d\n", n, num);
-		if(line[index] == '\n'){
+		/*
+		if(line[index] == '\\'){
 			index++;
 			num++;
-			//printf("%d\n", num);
+			if(line[index] == 'n'){
+				printf("%d\n", num);
 		}
+		*/
 		if(line[i] == pattern[index]){
 			matches++;
 			index++;
@@ -615,26 +622,4 @@ int dotSlashn(char* pattern,char* line){
 		return 1;
 	
 	return 0;
-}
-int zstring_search_chr(const char *token,char s){
-    if (!token || s=='\0')
-        return 0;
-
-    for (;*token; token++)
-        if (*token == s)
-            return 1;
-
-    return 0;
-}
-
-char *zstring_remove_chr(char *str,const char *bad) {
-    char *src = str , *dst = str;
-    while(*src)
-        if(zstring_search_chr(bad,*src))
-            src++;
-        else
-            *dst++ = *src++;  /* assign first, then incement */
-
-    *dst='\0';
-        return str;
 }
