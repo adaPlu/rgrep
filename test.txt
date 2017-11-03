@@ -1,4 +1,15 @@
+ C++
+A++
+ D++
+CCCCCCC\nC+\nC++
+A++DTJg2gQ
+AC++
+D++D++
+D++\n
+D++
 
+abc
+abcabc
 a
 aa
 aah
@@ -16,6 +27,7 @@ aasvogels
 abaci
 aback
 abacus
+\\\\\
 abacuses
 zyme
 zymogens
@@ -53,3 +65,8 @@ woooooo_CSE31.jpg
 aab
 aaab
 aaab
+ C++
+A++DTJg2gQ
+ D++
+woooooo_CSE31.jpg
+a\nb\nc
